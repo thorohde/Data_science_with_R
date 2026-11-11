@@ -1,0 +1,270 @@
+---
+title: "Untitled"
+format: html
+---
+
+# Introduction to R
+
+First, lets install some packages we will use today: 
+
+## Installing packages
+
+```{r, eval=FALSE}
+
+install.packages("data.table")
+install.packages("ggplot2")
+install.packages("forcats")
+install.packages("reshape2")
+
+```
+
+If you are questioned if you want to install the packages from source or update other packages, you can accept. If you face problems, try again answering `no`. 
+
+### The libPaths problem: 
+
+Optional, if the package installation doesn't work: If you get error messages that describe that you can't install the packages, the problem is likely that R has no writing access in the directory of your package library. 
+
+```{r}
+.libPaths() # This shows you the currently used directory (the first entry):
+```
+
+To solve the problem, we generate and use another directory for our libraries: 
+
+```{r, eval = FALSE}
+user_lib <- Sys.getenv("R_LIBS_USER") # find personal standard library directory
+dir.create(user_lib, recursive = TRUE, showWarnings = FALSE) # Create directory
+.libPaths(c(user_lib, .libPaths())) # Activate it
+.libPaths() # check if it worked
+```
+
+The `.libPaths()` call should show the new directory as first entry. Restart `RStudio` and try to install the package again, using the `install.packages()` line above. 
+
+
+Load packages: 
+
+```{r}
+library(data.table)
+library(ggplot2)
+
+```
+
+
+
+
+## Import data:
+
+Lets explore our DepMap cell line model/patient data. First, we import it using `fread()` and assign it to the variable `models`: 
+
+```{r, eval = FALSE}
+models <- fread("input_data/Model.csv")
+```
+
+Importing and cleaning data can be complicated, and I want to make sure that everybody is working with the same data. Please execute this script, which loads packages and required input data. You can always re-load the script if you accidently replaced it.  
+
+```{r}
+source("R/prepare_everything.R")
+```
+
+```{r}
+str(models)
+```
+
+`data.table` is a modern R package which introduces a compact syntax and very fast data handling. This is perfect for operations on the datasets we want to work with today. 
+Data tables are enhanced `data.frames`, so if you are familiar with `data.frames` and `tidyverse` functions, you can use them here as well. 
+Datatables/dataframes are perfect for storing different datatypes for many observations, e.g. age (numeric), sex (categorical), treatment status (logical), etc., across patients. Datatables are in most cases two-dimensional, with observations / measurements / patients in rows and features in columns. 
+
+```{r}
+head(models)
+```
+
+### Handling Datatables
+
+The data table syntax consists of three elements: 
+
+`DT[<rows>, <columns>, <by>]`. 
+
+`<rows>` defines the rows to extract from the `DT`. Often used with filter criteria. 
+`<columns>` defines the columns to select. Can also be used to create new columns or to execute functions in the data table. 
+`by` defines variables to group the data by. Can be used to elegantly summarize the information of the datatable. 
+
+Examples: 
+
+To only select certain columns, we wrap them in `.()`.  This is usually done **after** the first comma: 
+
+```{r}
+models[, .(Sex, Age)]
+```
+
+
+
+Important operator: `.N` returns the number of rows.  
+
+```{r}
+models[, .N]
+```
+
+`.N` is expecially useful when combined with a grouping variable after the second comma. We can write `by = `, but we don't have to. 
+Lets explore how many male and female patients (and patients with unknown sex) are in the dataset: 
+
+```{r}
+models[, .N, by = Sex]
+```
+
+This gives you a good overview on the options to subset the patients by. 
+
+Get an overview over the number of entries for each cancer type (`OncotreeLineage`):
+
+```{r}
+models[, .N, by = OncotreeLineage]
+```
+
+### Filtering datatables
+
+Filtering means creating a logical vector and only returning the rows where the vector is `TRUE`. 
+
+| Operator | Description |
+|---|---|
+| `==` | is equal |
+| `!=` | is unequal |
+| `>`, `<`, `>=`, `<=` | larger, smaller, greater or equal, ... |
+| `%in%` | required if we filter for more than one entry |
+
+
+
+Filtering criteria can be used and combined to subset the data. This returns entries for non-caucasian patients with breast or Lung cancer: 
+
+```{r}
+models[PatientRace != "caucasian" & 
+    OncotreeLineage %in% c("Breast", "Lung")]
+```
+
+Lets combine filtering and column subsetting. This returns only the columns Sex and Age for female patients: 
+```{r}
+models[Sex == "Female", .(Sex, Age)]
+```
+
+How many entries for `female` patients older than `30` years are in `models`?
+
+```{r}
+models[Age > 30 & Sex == "Female", .N]
+```
+
+If we want to summarize rows like this, we can use summarizing functions instead of only counting rows. `mean()` returns the mean value of a vector: 
+
+```{r}
+models[, .(Age = mean(Age, na.rm = TRUE))]
+```
+
+Now, lets explore the mean age for each gender in the dataset: 
+
+```{r}
+models[, .(Age = mean(Age, na.rm = TRUE)), by = Sex]
+```
+
+Now its your turn: For patients with `breast` cancer, what is the number of observations and the mean age, for each gender? 
+
+```{r}
+models[OncotreeLineage == "Breast", .(n_patients = .N, Age = mean(Age, na.rm = TRUE)), by = Sex]
+```
+
+# NAs
+
+`NAs` are missing values. They will occur in your data. Operations involving `NAs` often return `NA`. Therefore, many functions allow to ignore them: 
+
+```{r}
+sum(c(2, 12, NA))
+
+sum(c(2, 12, NA), na.rm = TRUE)
+```
+
+
+`is.na()` tells us if a value is NA. This is useful for filtering entries. 
+
+```{r}
+models[is.na(Sex)]
+```
+
+We can create new columns with `by`, too: 
+
+```{r}
+models[, .(mean_age = mean(Age), N = .N), by = .(Age_is_NA = is.na(Age))]
+```
+
+
+# Coding exercise 2: Arrays
+
+Arrays are great for storing large amounts of only-numeric data. In contrast to data.tables, they can have many more than two dimensions. One way of using these could be: 
+
+1. dimension: Genes
+2. dimension: drug treatments
+3. dimension: technical replicates
+4. media conditions
+... 
+
+Lets explore our expression dataset. How many dimensions does the object have? What do they store?
+
+```{r}
+str(expression)
+```
+
+We can subset arrays using vectors of numbers or characters: 
+
+```{r}
+str(expression[1:5,10:20])
+str(expression[,c("STPG1", "CFTR")])
+```
+
+Other useful R functions: 
+
+| Function | Returns / Explanation |
+|---|---|
+| `?mean()` | help and additional information on the `mean` function |
+| `str()` | dataset structure |
+| `dim()` | dimensions |
+| `dimnames()` | dimension names |
+| `intersect(a, b)` | elements in a and b |
+| `setdiff()` | elements of a that are not in b |
+| `cor()` | computes a correlation |
+
+
+
+
+
+
+
+
+
+
+
+
+[order(-N)]
+
+
+
+## For-loops
+
+If you want to execute the same operation on many elements, you can use a loop: 
+
+```{r}
+
+for (gene in oncogenes) {
+    print(paste0("Mean expression of ", gene, ": ", mean(expression[,gene], na.rm = TRUE)))
+}
+
+```
+
+There are more options to do this. 
+
+A very useful function to know is `apply()`. It allows very fast computations of aggregation functions (like `mean`, `sum` or `length`) on the whole array. Lets compute the mean expression for three genes across all columns of the dataset: 
+
+```{r}
+apply(expression[,oncogenes], 2, mean)
+```
+
+
+```{r}
+str(models)
+str(mut)
+str(expression)
+str(chronos)
+```

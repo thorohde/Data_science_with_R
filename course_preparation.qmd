@@ -1,0 +1,66 @@
+---
+format: pdf
+---
+
+# Course preparation
+
+## 1. Install R & RStudio: 
+
+Download and install `R` ([http://cran.r-project.org/](http://cran.r-project.org/)) and `RStudio` ([https://docs.posit.co/ide/user/download.html](https://docs.posit.co/ide/user/download.html)). If you need help, you find useful instructions here: [https://rstudio-education.github.io/hopr/starting.html](https://rstudio-education.github.io/hopr/starting.html)
+
+
+## 3. Install and load packages:
+
+Open RStudio, select an R version to work with, open the directory you want to work in (with the `input_data` folder in it) and try to execute this code line in the console: 
+
+```{r, eval=FALSE}
+install.packages("ggplot2")
+```
+
+If you are questioned of you want to install the packages from source or update other packages, you can accept. If you face problems, try again answering `no`. 
+
+Optional, if that doesn't work: If you get error messages that describe that you can't install the packages, the problem is likely that R has no writing access in the directory of your package library. 
+
+```{r}
+.libPaths() # This shows you the currently used directory (the first entry):
+```
+
+To solve the problem, we generate and use another directory for our libraries: 
+
+```{r, eval = FALSE}
+user_lib <- Sys.getenv("R_LIBS_USER") # find personal standard library directory
+dir.create(user_lib, recursive = TRUE, showWarnings = FALSE) # Create directory
+.libPaths(c(user_lib, .libPaths())) # Activate it
+.libPaths() # check if it worked
+```
+
+The `.libPaths()` call should show the new directory as first entry. Restart `RStudio` and try to install the package again, using the `install.packages()` line above. 
+
+## Finally, execute this code to see if the installed packages work: 
+
+```{r}
+library(ggplot2); data(penguins)
+ggplot(penguins, aes(bill_len, flipper_len, color = species)) + 
+    theme_light() + 
+    geom_point(na.rm = T)
+```
+
+
+
+## 1. Download DepMap datasets: 
+
+Please visit the `DepMap Portal` ([https://depmap.org/portal/](https://depmap.org/portal/)) page and then to `Downloads` -> `Enter DepMap` -> `All Data`. We need the following files from version `DepMap Public 26Q3`: 
+
+| Data | Filename |
+|---|---|
+| Model metadata | Model.csv |
+| Chronos scores | CRIPSRGeneEffect.csv |
+| Gene Expression | OmicsExpressionTPMLogp1HumanProteinCodingGenes.csv |
+| Mutation status | OmicsSomaticMutations.csv |
+
+Download these files and place them in a folder named `input_data`. If this worked, you are ready to go!
+
+
+If you have questions, feel free to contact me:
+
+Thomas Rohde, AG Billmann, thomas.rohde@uni-bonn.de
