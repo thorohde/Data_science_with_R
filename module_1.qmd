@@ -3,65 +3,34 @@ title: "Module 1"
 format: html
 ---
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 source("R/prepare_everything.R")
 ```
 
 
-# Module 1: Oncogenes
+## Module 1: Sex chromosome biology: Do models annotated as male or female differ in expression of Y-linked genes?
 
-| Gene | Biological role |
-|---|---|
-| TP53 | Tumor suppressor, DNA damage response |
-| KRAS | Oncogene, MAPK signaling |
-| BRAF | Oncogene, MAPK signaling |
-| APC | Tumor suppressor, WNT signaling |
-| PTEN | Tumor suppressor, PI3K/AKT signaling |
-| PIK3CA | Oncogene, PI3K signaling |
-| EGFR | Receptor tyrosine kinase |
-| RB1 | Tumor suppressor, cell-cycle regulation |
-| CDKN2A | Tumor suppressor, cell-cycle control |
-| SMARCA4 | Chromatin remodeling |
-
-
-# Task 1: Oncogenes
-
-`oncogenes` contains a set of ten genes that are strongly associated with tomorigenesis and therefore highly clinically relevant. 
-
-```{r}
-oncogenes
-```
-
-1.1 Let's explore the `mut` mutation data. What does it contain?
+`chr_y_genes` contains genes located on the Y chromosome: 
 
 ```{r}
 
 ```
 
-
-1.2 How many cell lines show a mutation for each of the oncogenes. What is the most frequently mutated oncogene?
-
-```{r}
-mut[HugoSymbol %in% oncogenes, .N, by = HugoSymbol][order(-N)]
-```
-
-# 1.2: Find out the mean expression of SOX10 in Melanoma cell lines, as well as in non-Melanoma cell lines. 
+1.1 Explore the patient data and find out where to find out information on the sex/gender. How many samples do we have for each sex? Do we have this info for all patients?
 
 ```{r}
-cell_lines_oi <- models[OncotreePrimaryDisease == "Melanoma", unique(ModelID)]
-
-mean(expression[setdiff(rownames(expression), cell_lines_oi),"SOX10"], na.rm = T)
-mean(expression[intersect(rownames(expression), cell_lines_oi),"SOX10"], na.rm = T)
 
 ```
 
-
-# 1.3: Tumors can be caused by different kinds of mutations. Popular tumor-causing mutations are loss of function of tumor suppressor genes. Compute the number of mutations per oncogene, now also including if the mutation is likely a loss of function mutation. Find a way to plot these numbers. Do you observe a difference for TP53 and KRAS?
+1.2 Compute the expression of all `chr_y_genes`, independently for each sex. We don't need to look at every gene individually. What do you observe? Find a nice way to visualize that. 
 
 ```{r}
-mut[HugoSymbol %in% oncogenes, .N, by = .(HugoSymbol, LikelyLoF)] |>
-  ggplot(aes(N, HugoSymbol, fill = LikelyLoF)) + 
-  geom_col() + 
-  theme(legend.position = "bottom")
+
+```
+
+1.3 Lets assume we explore a research question that requires as many female patients as possible. We can use the `r models[Sex == "Female", .N]` with assigned metadata, but we want to look for female patients among the patients with unknown or missing sex information. Can we find out (or at least make an educated guess) if a patient is likely male or female? Find a way to visualize that. 
+
+```{r}
+
 ```
 

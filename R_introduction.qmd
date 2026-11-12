@@ -1,9 +1,7 @@
 ---
-title: "Untitled"
+title: "Introduction to R"
 format: html
 ---
-
-# Introduction to R
 
 First, lets install some packages we will use today: 
 
@@ -37,10 +35,9 @@ dir.create(user_lib, recursive = TRUE, showWarnings = FALSE) # Create directory
 .libPaths() # check if it worked
 ```
 
-The `.libPaths()` call should show the new directory as first entry. Restart `RStudio` and try to install the package again, using the `install.packages()` line above. 
+The `.libPaths()` call should show the new directory as first entry. Restart `RStudio` and try to install the package again, using the `install.packages()` line above. If that doesn't work, restart `RStudio`with administrator rights and try again. 
 
-
-Load packages: 
+## Load packages: 
 
 ```{r}
 library(data.table)
@@ -61,23 +58,15 @@ models <- fread("input_data/Model.csv")
 
 Importing and cleaning data can be complicated, and I want to make sure that everybody is working with the same data. Please execute this script, which loads packages and required input data. You can always re-load the script if you accidently replaced it.  
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 source("R/prepare_everything.R")
 ```
 
-```{r}
-str(models)
-```
+## Handling Datatables
 
 `data.table` is a modern R package which introduces a compact syntax and very fast data handling. This is perfect for operations on the datasets we want to work with today. 
-Data tables are enhanced `data.frames`, so if you are familiar with `data.frames` and `tidyverse` functions, you can use them here as well. 
+`Data.tables` are enhanced `data.frames`, which makes them compatible with the `tidyverse` functions as well as `ggplot2`. 
 Datatables/dataframes are perfect for storing different datatypes for many observations, e.g. age (numeric), sex (categorical), treatment status (logical), etc., across patients. Datatables are in most cases two-dimensional, with observations / measurements / patients in rows and features in columns. 
-
-```{r}
-head(models)
-```
-
-### Handling Datatables
 
 The data table syntax consists of three elements: 
 
@@ -89,21 +78,28 @@ The data table syntax consists of three elements:
 
 Examples: 
 
+```{r}
+str(models)
+```
+
+```{r}
+head(models)
+```
+
+
 To only select certain columns, we wrap them in `.()`.  This is usually done **after** the first comma: 
 
 ```{r}
 models[, .(Sex, Age)]
 ```
 
-
-
-Important operator: `.N` returns the number of rows.  
+Important data.table operator: `.N` returns the number of rows.  
 
 ```{r}
 models[, .N]
 ```
 
-`.N` is expecially useful when combined with a grouping variable after the second comma. We can write `by = `, but we don't have to. 
+`.N` is particularly useful when combined with a grouping variable after the second comma. We can write `by = `, but we don't have to. 
 Lets explore how many male and female patients (and patients with unknown sex) are in the dataset: 
 
 ```{r}
@@ -118,6 +114,11 @@ Get an overview over the number of entries for each cancer type (`OncotreeLineag
 models[, .N, by = OncotreeLineage]
 ```
 
+We can combine multiple operations in one step, by connecting the brackets `[][]`. Lets sort the cancer types by their number of observations: 
+```{r}
+models[, .N, by = OncotreeLineage][order(N, decreasing = TRUE)]
+```
+
 ### Filtering datatables
 
 Filtering means creating a logical vector and only returning the rows where the vector is `TRUE`. 
@@ -129,16 +130,14 @@ Filtering means creating a logical vector and only returning the rows where the 
 | `>`, `<`, `>=`, `<=` | larger, smaller, greater or equal, ... |
 | `%in%` | required if we filter for more than one entry |
 
-
-
-Filtering criteria can be used and combined to subset the data. This returns entries for non-caucasian patients with breast or Lung cancer: 
+Filtering criteria can be used and combined using `&` to subset the data. This operation returns entries for non-caucasian patients with breast or Lung cancer: 
 
 ```{r}
-models[PatientRace != "caucasian" & 
-    OncotreeLineage %in% c("Breast", "Lung")]
+models[PatientRace != "caucasian" & OncotreeLineage %in% c("Breast", "Lung")]
 ```
 
-Lets combine filtering and column subsetting. This returns only the columns Sex and Age for female patients: 
+Lets combine filtering and column subsetting. This returns only the columns Sex and Age only for female patients: 
+
 ```{r}
 models[Sex == "Female", .(Sex, Age)]
 ```
@@ -149,27 +148,16 @@ How many entries for `female` patients older than `30` years are in `models`?
 models[Age > 30 & Sex == "Female", .N]
 ```
 
-If we want to summarize rows like this, we can use summarizing functions instead of only counting rows. `mean()` returns the mean value of a vector: 
+
+Instead of only counting rows, we can summarize numeric data using aggregation functions instead of only counting rows. `mean()` returns the mean value of a vector: 
 
 ```{r}
-models[, .(Age = mean(Age, na.rm = TRUE))]
+models[, .(Age = mean(Age))]
 ```
 
-Now, lets explore the mean age for each gender in the dataset: 
+### NAs
 
-```{r}
-models[, .(Age = mean(Age, na.rm = TRUE)), by = Sex]
-```
-
-Now its your turn: For patients with `breast` cancer, what is the number of observations and the mean age, for each gender? 
-
-```{r}
-models[OncotreeLineage == "Breast", .(n_patients = .N, Age = mean(Age, na.rm = TRUE)), by = Sex]
-```
-
-# NAs
-
-`NAs` are missing values. They will occur in your data. Operations involving `NAs` often return `NA`. Therefore, many functions allow to ignore them: 
+`NAs` ("not available") are missing values. They will occur in your data. Operations involving `NAs` often return `NA`. Therefore, many functions offer something like `na.rm` to ignore them: 
 
 ```{r}
 sum(c(2, 12, NA))
@@ -177,29 +165,40 @@ sum(c(2, 12, NA))
 sum(c(2, 12, NA), na.rm = TRUE)
 ```
 
-
-`is.na()` tells us if a value is NA. This is useful for filtering entries. 
+`is.na()` tests if a value is NA. This is useful for filtering entries. 
 
 ```{r}
-models[is.na(Sex)]
+models[, .N, by = is.na(Age)]
 ```
+
+To get the mean age ignoring NAs, we can either do this: 
+
+```{r}
+models[!is.na(Age), .(mean_age = mean(Age))]
+```
+or this: 
+```{r}
+models[, .(mean_age = mean(Age, na.rm = TRUE))]
+```
+
 
 We can create new columns with `by`, too: 
 
 ```{r}
-models[, .(mean_age = mean(Age), N = .N), by = .(Age_is_NA = is.na(Age))]
+models[, .(mean_age = mean(Age), N = .N), by = .(age_is_NA = is.na(Age))]
 ```
 
 
-# Coding exercise 2: Arrays
+Now its your turn: For patients with `breast` cancer, what is the number of observations and the mean age, for each gender? 
 
-Arrays are great for storing large amounts of only-numeric data. In contrast to data.tables, they can have many more than two dimensions. One way of using these could be: 
+```{r}
+models[OncotreeLineage == "Breast", .(n_patients = .N, mean_age = mean(Age, na.rm = TRUE)), by = Sex]
+```
 
-1. dimension: Genes
-2. dimension: drug treatments
-3. dimension: technical replicates
-4. media conditions
-... 
+
+## Handling arrays
+
+Arrays are great for storing large amounts of only-numeric data. In contrast to data.tables, they can have many more than two dimensions. 
 
 Lets explore our expression dataset. How many dimensions does the object have? What do they store?
 
@@ -210,8 +209,14 @@ str(expression)
 We can subset arrays using vectors of numbers or characters: 
 
 ```{r}
-str(expression[1:5,10:20])
-str(expression[,c("STPG1", "CFTR")])
+expression[1:5,10:20]
+expression[c("ACH-001339", "ACH-001619", "ACH-001979"),c("STPG1", "CFTR")]
+```
+
+A very useful function to know when dealing with arrays is `apply()`. It allows very fast computations of aggregation functions (like `mean`, `sum` or `length`) on the whole array. Lets compute the mean expression for three genes across all columns of the dataset: 
+
+```{r}
+apply(expression[,oncogenes], 2, mean)
 ```
 
 Other useful R functions: 
@@ -219,52 +224,61 @@ Other useful R functions:
 | Function | Returns / Explanation |
 |---|---|
 | `?mean()` | help and additional information on the `mean` function |
-| `str()` | dataset structure |
 | `dim()` | dimensions |
 | `dimnames()` | dimension names |
 | `intersect(a, b)` | elements in a and b |
 | `setdiff()` | elements of a that are not in b |
 | `cor()` | computes a correlation |
 
+## ggplot
 
+`ggplot` (or `ggplot2`) is one of the most popular systems to create sophisticated plots, and is highly popular in science. Learning `ggplot` prepares you for creating all kinds of data visualizations. 
 
+A ggplot consists of a minimum of three objects: 
+1. data (a datatable or data frame with the information to build the plot)
+2. mapping: an aesthetics object (`aes()`) defines which information is mapped where in the plot
+3. geometries define the layout of the plot. 
 
-
-
-
-
-
-
-
-
-[order(-N)]
-
-
-
-## For-loops
-
-If you want to execute the same operation on many elements, you can use a loop: 
+Example: 
 
 ```{r}
 
-for (gene in oncogenes) {
-    print(paste0("Mean expression of ", gene, ": ", mean(expression[,gene], na.rm = TRUE)))
-}
+plot_data <- models[, .(n_obs = .N), OncotreeLineage][n_obs > 50]
+
+ggplot(
+  data = plot_data, 
+  mapping = aes(x = n_obs, y = OncotreeLineage)) + 
+  geom_col()
 
 ```
 
-There are more options to do this. 
 
-A very useful function to know is `apply()`. It allows very fast computations of aggregation functions (like `mean`, `sum` or `length`) on the whole array. Lets compute the mean expression for three genes across all columns of the dataset: 
+Lets explore what happened here. 
+First, we compute the number of observations by Lineage and subset the resulting datatable for Lineages with more than 20 entries. 
+This is used as input data for ggplot. In `aes()`, n_obs is mapped on the x-axis, the lineage on y. Finally, we add `geom_col()` to our plot, to define a bar plot. 
 
+By adding more objects to the ggplot using `+`, we can start plotting 
 ```{r}
-apply(expression[,oncogenes], 2, mean)
+
+plot_data <- models[Sex %in% c("Male", "Female"), .(n_obs = .N), by = .(Sex, OncotreeLineage)]
+
+ggplot(plot_data, aes(x = n_obs, y = OncotreeLineage, fill = Sex)) + 
+    geom_col(color = "black") + 
+    labs(x = "# Observations", y = "Tissue type") + 
+    theme(legend.position = "bottom")
 ```
 
-
+Lets try a boxplot to visualize the age ranges for some tumor type: 
 ```{r}
-str(models)
-str(mut)
-str(expression)
-str(chronos)
+plot_data <- models[Sex %in% c("Male", "Female") & 
+    OncotreeLineage %in% c("Peripheral Nervous System", "Testis", "Kidney", "Bowel")]
+
+ggplot(plot_data, 
+aes(Age, OncotreeLineage, color = Sex)) + 
+    geom_boxplot() + 
+    theme(legend.position = "bottom")
 ```
+
+
+If you want to explore what is possible with ggplot, feel free to explore [https://r-graph-gallery.com/](https://r-graph-gallery.com/). 
+
