@@ -3,6 +3,8 @@ title: "Introduction to R"
 format: html
 ---
 
+The code for this course can be found at [https://github.com/thorohde/Data_science_with_R](https://github.com/thorohde/Data_science_with_R). 
+
 First, lets install some packages we will use today: 
 
 ## Installing packages
