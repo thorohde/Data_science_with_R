@@ -118,7 +118,7 @@ models[, .N, by = OncotreeLineage]
 
 We can combine multiple operations in one step, by connecting the brackets `[][]`. Lets sort the cancer types by their number of observations: 
 ```{r}
-models[, .N, by = OncotreeLineage][order(N, decreasing = TRUE)]
+models[, .N, by = OncotreeLineage][order(N, decreasing = FALSE)]
 ```
 
 ### Filtering datatables
@@ -191,11 +191,15 @@ models[, .(mean_age = mean(Age), N = .N), by = .(age_is_NA = is.na(Age))]
 ```
 
 
-Now its your turn: For patients with `breast` cancer, what is the number of observations and the mean age, for each gender? 
+Now its your turn: For patients with `Breast` cancer, what is the number of observations and the mean age, for each sex? 
 
 ```{r}
-
+models[OncotreeLineage == "Breast", 
+       .(n_observations = .N, mean_age = mean(Age, na.rm = TRUE)), 
+       by = Sex]
 ```
+
+
 
 
 ## Handling arrays
@@ -212,14 +216,62 @@ We can subset arrays using vectors of numbers or characters:
 
 ```{r}
 expression[1:5,10:20]
+```
+
+```{r}
+str(expression)
+```
+
+```{r}
+str(expression[1:5,20:30])
+```
+```{r}
+
+```
+
+
+
+
+
+```{r}
+
 expression[c("ACH-001339", "ACH-001619", "ACH-001979"),c("STPG1", "CFTR")]
 ```
 
 A very useful function to know when dealing with arrays is `apply()`. It allows very fast computations of aggregation functions (like `mean`, `sum` or `length`) on the whole array. Lets compute the mean expression for three genes across all columns of the dataset: 
 
+
 ```{r}
-apply(expression[,oncogenes], 2, mean)
+mean(expression[, oncogenes], na.rm = TRUE)
 ```
+```{r}
+
+```
+
+
+```{r}
+apply(expression[,oncogenes], 2, mean, na.rm = TRUE)
+```
+```{r}
+str(expression[,c("STAG2", "TP53")])
+
+str(expression[,c("TP53")])
+
+```
+
+
+
+# For-loops
+
+```{r}
+for (g in oncogenes) {
+  print(paste0(g, ": ", mean(expression[,g], na.rm = TRUE)))
+}
+```
+
+
+
+
 
 Other useful R functions: 
 
@@ -244,6 +296,18 @@ A ggplot consists of a minimum of three objects:
 Example: 
 
 ```{r}
+plot_data <- models[, .N, by = OncotreeLineage]
+
+ggplot(data = plot_data, 
+       mapping = aes(x = N, y = OncotreeLineage)) + 
+  geom_col() +
+  geom_point(size = 3, color = "orange")# + 
+  #theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+```{r}
 
 plot_data <- models[, .(n_obs = .N), OncotreeLineage][n_obs > 50]
 
@@ -260,6 +324,14 @@ First, we compute the number of observations by Lineage and subset the resulting
 This is used as input data for ggplot. In `aes()`, n_obs is mapped on the x-axis, the lineage on y. Finally, we add `geom_col()` to our plot, to define a bar plot. 
 
 By adding more objects to the ggplot using `+`, we can start plotting 
+
+
+
+
+
+
+
+
 ```{r}
 
 plot_data <- models[Sex %in% c("Male", "Female"), .(n_obs = .N), by = .(Sex, OncotreeLineage)]
@@ -271,12 +343,17 @@ ggplot(plot_data, aes(x = n_obs, y = OncotreeLineage, fill = Sex)) +
 ```
 
 Lets try a boxplot to visualize the age ranges for some tumor type: 
+
+```{r}
+ggplot(plot_data, aes(), ...)
+```
+
 ```{r}
 plot_data <- models[Sex %in% c("Male", "Female") & 
     OncotreeLineage %in% c("Peripheral Nervous System", "Testis", "Kidney", "Bowel")]
 
 ggplot(plot_data, 
-aes(Age, OncotreeLineage, color = Sex)) + 
+aes(x = Age, y = OncotreeLineage, fill = Sex)) + 
     geom_boxplot() + 
     theme(legend.position = "bottom")
 ```

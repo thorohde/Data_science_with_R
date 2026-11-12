@@ -2,6 +2,13 @@
 format: pdf
 ---
 
+
+
+https://github.com/thorohde/Data_science_with_R
+
+
+
+
 # Course preparation
 
 ## 1. Install R & RStudio: 
@@ -9,7 +16,7 @@ format: pdf
 Download and install `R` ([http://cran.r-project.org/](http://cran.r-project.org/)) and `RStudio` ([https://docs.posit.co/ide/user/download.html](https://docs.posit.co/ide/user/download.html)). If you need help, you find useful instructions here: [https://rstudio-education.github.io/hopr/starting.html](https://rstudio-education.github.io/hopr/starting.html)
 
 
-## 3. Install and load packages:
+## 2. Install and load packages:
 
 Open RStudio, select an R version to work with, open the directory you want to work in (with the `input_data` folder in it) and try to execute this code line in the console: 
 
@@ -47,7 +54,7 @@ ggplot(penguins, aes(bill_len, flipper_len, color = species)) +
 
 
 
-## 1. Download DepMap datasets: 
+## 3. Download DepMap datasets: 
 
 Please visit the `DepMap Portal` ([https://depmap.org/portal/](https://depmap.org/portal/)) page and then to `Downloads` -> `Enter DepMap` -> `All Data`. We need the following files from version `DepMap Public 26Q3`: 
 

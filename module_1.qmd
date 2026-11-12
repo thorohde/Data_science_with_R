@@ -13,10 +13,32 @@ source("R/prepare_everything.R")
 `chr_y_genes` contains genes located on the Y chromosome: 
 
 ```{r}
+chr_y_genes
+```
+Lets find the patients present in the expression dataset:
+
+```{r}
+
+models[, intersect(ModelID, rownames(expression))]
+```
+
+```{r}
+female_expression_models <- models[
+  ModelID %in% rownames(expression) & Sex == "Female", ModelID]
+
 
 ```
 
-1.1 Explore the patient data and find out where to find out information on the sex/gender. How many samples do we have for each sex? Do we have this info for all patients?
+```{r}
+str(expression)
+```
+
+```{r}
+str(expression[female_expression_models,])
+```
+
+
+1.1 Explore the `models` data and find out where to find out information on the sex/gender. How many samples do we have for each sex? Do we have this info for all patients?
 
 ```{r}
 

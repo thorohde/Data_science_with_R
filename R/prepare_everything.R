@@ -81,6 +81,7 @@ oncogenes <- c(
   "TP53",
   "KRAS",
   "BRAF",
+  "BRCA1",
   "APC",
   "PTEN",
   "PIK3CA",
