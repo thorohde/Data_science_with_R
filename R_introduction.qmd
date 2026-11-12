@@ -192,7 +192,7 @@ models[, .(mean_age = mean(Age), N = .N), by = .(age_is_NA = is.na(Age))]
 Now its your turn: For patients with `breast` cancer, what is the number of observations and the mean age, for each gender? 
 
 ```{r}
-models[OncotreeLineage == "Breast", .(n_patients = .N, mean_age = mean(Age, na.rm = TRUE)), by = Sex]
+
 ```
 
 
