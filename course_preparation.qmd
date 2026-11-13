@@ -61,7 +61,7 @@ Please visit the `DepMap Portal` ([https://depmap.org/portal/](https://depmap.or
 | Data | Filename |
 |---|---|
 | Model metadata | Model.csv |
-| Chronos scores | CRIPSRGeneEffect.csv |
+| Chronos scores | CRISPRGeneEffect.csv |
 | Gene Expression | OmicsExpressionTPMLogp1HumanProteinCodingGenes.csv |
 | Mutation status | OmicsSomaticMutations.csv |
 

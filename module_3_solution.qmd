@@ -1,6 +1,6 @@
 ---
 title: "Module 3 solution"
-format: html
+format: pdf
 ---
 
 ```{r, message = FALSE, warning = FALSE}
