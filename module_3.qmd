@@ -13,8 +13,7 @@ source("R/prepare_everything.R")
 
 For specific genes, it has been explored that they can fulfill the function of another gene. This is specifically relevant for highly essential gene functions, which can be often fulfilled by multiple genes. 
 
-
-The buffering potential of a gene on another can be quantified if the Chronos scores of one gene. of one genes Chronos scores on the expression of another. 
+The buffering potential of a gene on another can be quantified if the expression values of one gene correlate of one genes Chronos scores of another gene. 
 
 ### 3.1: 
 
@@ -35,7 +34,7 @@ Compute the correlation for all genes from the expression set with the Chronos s
 
 ### 3.3
 
-Plot the CDS1 expression on the X axis and the CDS2 Chronos scores on Y. Create a scatter plot (`geom_point`). Also add a fit to visualize the trend `geom_smooth()`. 
+Plot the CDS1 expression on the X axis and the CDS2 Chronos scores on Y. Create a scatter plot (`geom_point`). Also add a fit to visualize the trend with `geom_smooth()`. 
 
 
 ```{r}
@@ -44,7 +43,7 @@ Plot the CDS1 expression on the X axis and the CDS2 Chronos scores on Y. Create 
 
 Challenge: 
 
-Try the same plot, but color the points by their `OncotreeLineage`. You might want to remove `geom_smooth()`, You should move the `color` aesthetics to geom_point(), otherwise geom_smooth() tries to compute many fits for very few datapoints, causing a ton of error messages: 
+Try the same plot, but color the points by their `OncotreeLineage`. You might want to remove `geom_smooth()`, You should move the `color` aesthetics to `geom_point()`, otherwise `geom_smooth()` tries to compute many fits for very few datapoints, causing a ton of warnings and error messages. 
 
 
 ```{r}

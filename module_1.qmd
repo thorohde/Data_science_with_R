@@ -17,25 +17,20 @@ chr_y_genes
 ```
 Lets find the patients present in the expression dataset:
 
-```{r}
 
-models[, intersect(ModelID, rownames(expression))]
-```
 
 ```{r}
-female_expression_models <- models[
-  ModelID %in% rownames(expression) & Sex == "Female", ModelID]
-
 
 ```
 
 ```{r}
 str(expression)
+str(expression[female,])
+str(expression[male,])
+str(expression[unknown,])
 ```
 
-```{r}
-str(expression[female_expression_models,])
-```
+
 
 
 1.1 Explore the `models` data and find out where to find out information on the sex/gender. How many samples do we have for each sex? Do we have this info for all patients?
