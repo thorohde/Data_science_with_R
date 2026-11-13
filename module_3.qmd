@@ -18,32 +18,13 @@ The buffering potential of a gene on another can be quantified if the Chronos sc
 
 ### 3.1: 
 
-Lets compute the correlation between the expression values of `CDS1`and the Chronos scores of `CDS2` using `cor()`. Does that work? Can you figure out why (not)?: 
+Lets compute the correlation between the expression values of `CDS1`and the Chronos scores of `CDS2` using `cor()`. 
 
 ```{r}
 
 ```
-
-Now try using `cor()` with the argument `use = "pairwise.complete.obs"`. 
-
-```{r}
-
-```
-
-
-
 
 ### 3.2
-
-Plot the CDS1 expression on the X axis and the CDS2 Chronos scores on Y. Create a scatter plot (`geom_point`). Also add a fit to visualize the trend `geom_smooth()`. Bonus points if you manage to color the points by their `OncotreeLineage`. 
-
-```{r}
-
-```
-
-
-
-### 3.3
 
 Compute the correlation for all genes from the expression set with the Chronos scores of `CDS2`. Is CDS1 an extreme value or rather average?
 
@@ -52,5 +33,21 @@ Compute the correlation for all genes from the expression set with the Chronos s
 ```
 
 
+### 3.3
 
+Plot the CDS1 expression on the X axis and the CDS2 Chronos scores on Y. Create a scatter plot (`geom_point`). Also add a fit to visualize the trend `geom_smooth()`. 
+
+
+```{r}
+
+```
+
+Challenge: 
+
+Try the same plot, but color the points by their `OncotreeLineage`. You might want to remove `geom_smooth()`, You should move the `color` aesthetics to geom_point(), otherwise geom_smooth() tries to compute many fits for very few datapoints, causing a ton of error messages: 
+
+
+```{r}
+
+```
 
