@@ -1,0 +1,98 @@
+---
+title: "Module 2 solution"
+format: pdf
+---
+
+```{r, message = FALSE, warning = FALSE}
+source("R/prepare_everything.R")
+```
+
+
+
+## Chronos scores: Gene essentiality
+
+Genes can be relevant or irrelevant for cellular survival. Essential genes strongly impact cellular growth if they are perturbed. 
+Chronos scores in DepMap quantify how strongly a cancer cell line depends on a particular gene for its growth or survival. 
+
+The key principle is: **the more negative the Chronos score, the stronger the dependency on that gene**.
+
+| Chronos score | Interpretation |
+|---|---|
+| +0.5 | Gene knockout may confer a growth advantage |
+| 0 | No substantial effect on cell growth or survival |
+|-0.5 | Moderate dependency |
+| -1 | 	Effect comparable to the median common-essential gene |
+| -2 | Very strong dependency |
+
+### 2.1
+Explore the `chronos` dataset. What does it contain? How many genes are generally essential (have a mean chronos score of < 1 across all cell lines)?
+
+```{r}
+sum(apply(chronos, 2, mean, na.rm = TRUE) < -1)
+```
+
+### 2.2
+
+Familiarize yourself with the `mut` mutation dataset. How many cell lines show a mutation for each of the oncogenes? What is the most frequently mutated oncogene?
+
+```{r}
+mut[HugoSymbol %in% oncogenes, .N, by = HugoSymbol][order(-N)]
+```
+
+### 2.3
+
+`oncogenes` contains a set of ten genes that are strongly associated with tomorigenesis and therefore highly clinically relevant. 
+
+```{r}
+oncogenes
+```
+
+Tumors can be caused by different kinds of mutations. Popular tumor-causing mutations are loss of function of tumor suppressor genes. Compute the number of mutations per oncogene, now also including if the mutation is likely a loss of function mutation. Find a way to plot these numbers. Do you observe a difference for TP53 and KRAS?
+
+```{r}
+ggplot(mut[HugoSymbol %in% oncogenes, .N, by = .(HugoSymbol, LikelyLoF)], 
+  aes(N, HugoSymbol, fill = LikelyLoF)) + 
+  geom_col() + 
+  theme(legend.position = "bottom")
+```
+
+### 2.4
+
+`TP53` encodes p53, which can trigger cell-cycle arrest or apoptosis. `MDM2` negatively regulates p53. 
+In a cell with functional p53, removing `MDM2` can reactivate p53 signaling and strongly impair cellular growth. In a cell where `TP53` is functionally inactivated, removing `MDM2` often has a much smaller effect.
+
+Are `TP53`-wild-type cell lines more dependent on `MDM2` than `TP53`-mutated cell lines?
+We want to explore if there is an observable difference in the Chronos scores of `MDM2` for cell lines with a mutation in `TP53`. 
+Find out which cell lines likely have a disfunctional / inactive `TP53` gene. Explore if the Chronos scores of `MDM2` are different for these cell lines compared to cell lines with functional `TP53`. Optionally, find a way to visualize that. 
+
+```{r}
+tp53_mut_cell_lines <- mut[HugoSymbol == "TP53" & LikelyLoF, unique(ModelID)]
+
+plot_data <- data.table(
+    cell_line = rownames(chronos), 
+    TP53_status = fcase(rownames(chronos) %in% tp53_mut_cell_lines, "TP53 mutant", 
+    default = "TP53 WT"), 
+    MDM2_chronos = chronos[,"MDM2"]
+    )
+
+ggplot(plot_data, aes(TP53_status, MDM2_chronos, fill = TP53_status)) + 
+  geom_boxplot() + 
+  theme(legend.position = "bottom")
+
+```
+
+### 2.5 (Bonus exercise)
+
+Is the observed difference significant? Try to test this using a `t.test()` between the two sets of values. Is the p-value smaller than 0.05?
+
+
+```{r}
+t_test <- t.test(plot_data[TP53_status == "TP53 mutant", MDM2_chronos], 
+       plot_data[TP53_status == "TP53 WT", MDM2_chronos])
+
+
+t_test$p.value < 0.05
+
+```
+
+

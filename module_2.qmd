@@ -50,7 +50,7 @@ mut
 oncogenes
 ```
 
-Tumors can be caused by different kinds of mutations. Popular tumor-causing mutations are loss of function of tumor suppressor genes. Compute the number of mutations per oncogene, now also including if the mutation is likely a loss of function mutation (`LikelyLoF`). Find a way to plot these numbers. Do you observe a difference for TP53 and KRAS?
+Tumors can be caused by different kinds of mutations. Popular tumor-causing mutations are loss of function of tumor suppressor genes. Compute the number of mutations per oncogene, now also including if the mutation is likely a loss of function mutation (`LikelyLoF`). Find a way to plot these numbers. Do you observe a difference for `TP53` and `KRAS`?
 
 Hints: Use `mut`, filter for `oncogenes`, and group by `LikelyLoF`. 
 When creating a ggplot from this, you can add `LikelyLoF` as a `fill` argument to the aesthetics. 
@@ -61,16 +61,16 @@ When creating a ggplot from this, you can add `LikelyLoF` as a `fill` argument t
 
 ### 2.4
 
-TP53 encodes p53, which can trigger cell-cycle arrest or apoptosis. MDM2 negatively regulates p53. 
-In a cell with functional p53, removing `MDM2 can reactivate p53 signaling and strongly impair cellular growth. In a cell where TP53 is functionally inactivated, removing MDM2 often has a much smaller effect.
+`TP53` encodes p53, which can trigger cell-cycle arrest or apoptosis. `MDM2` negatively regulates p53. 
+In a cell with functional p53, removing `MDM2` can reactivate p53 signaling and strongly impair cellular growth. In a cell where `TP53` is functionally inactivated, removing `MDM2`often has a much smaller effect.
 
-Are TP53-wild-type cell lines more dependent on MDM2 than TP53-mutated cell lines?
-We want to explore if there is an observable difference in the Chronos scores of MDM2 for cell lines with a mutation in TP53. 
-Explore if the Chronos scores of MDM2 are different for these cell lines compared to cell lines with functional TP53. Optionally, find a way to visualize that. 
+Are `TP53`-wild-type cell lines more dependent on `MDM2`than `TP53`-mutated cell lines?
+We want to explore if there is an observable difference in the Chronos scores of `MDM2`for cell lines with a mutation in `TP53`. 
+Explore if the Chronos scores of `MDM2`are different for these cell lines compared to cell lines with functional TP53. Optionally, find a way to visualize that. 
 
 Hint: 
 1. Find out which cell lines likely have a disfunctional / inactive TP53 gene, use `mut`, filter for `LikelyLoF` to be true, and extract the cell lines. 
-2. Subset the Chronos scores of MDM2 for the TP53 mutants as well as for all other cell lines. 
+2. Subset the Chronos scores of `MDM2`for the `TP53` mutants as well as for all other cell lines. 
 
 ```{r}
 
@@ -79,4 +79,8 @@ Hint:
 ### 2.5 (Bonus exercise)
 
 Is the observed difference significant? Try to test this using a `t.test()` between the two value sets. Is the p-value smaller than 0.05? 
+
+```{r}
+
+```
 

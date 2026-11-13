@@ -41,3 +41,15 @@ required R packages and download the DepMap input data. Open a `.qmd` file in
 RStudio to work through or render a lesson. The repository is organised so
 that the preparation script and lessons find the input files through the
 relative paths listed above.
+
+
+
+
+
+## Additional resources for learning R
+
+- **R for data science** ([https://r4ds.hadley.nz/](https://r4ds.hadley.nz/))
+- Inspiration for scientific data visualizations: **The R graph gallery** ([https://r-graph-gallery.com/](https://r-graph-gallery.com/)) 
+- Youtube channel teaching R basics: **R programming 101** ([www.youtube.com/@RProgramming101](www.youtube.com/@RProgramming101))
+- Youtube channel for learning statistics and Machine Learning: **Statquest with Joshua Harmer** ([https://www.youtube.com/@statquest](https://www.youtube.com/@statquest))
+

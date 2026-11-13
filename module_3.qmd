@@ -17,7 +17,7 @@ The buffering potential of a gene on another can be quantified if the expression
 
 ### 3.1: 
 
-Lets compute the correlation between the expression values of `CDS1`and the Chronos scores of `CDS2` using `cor()`. 
+Lets compute the correlation between the expression values of `CDS1` and the Chronos scores of `CDS2` using `cor()`. 
 
 ```{r}
 
@@ -34,7 +34,7 @@ Compute the correlation for all genes from the expression set with the Chronos s
 
 ### 3.3
 
-Plot the CDS1 expression on the X axis and the CDS2 Chronos scores on Y. Create a scatter plot (`geom_point`). Also add a fit to visualize the trend with `geom_smooth()`. 
+Plot the CDS1 expression on the X axis and the CDS2 Chronos scores on Y. Create a scatter plot (`geom_point()`). Also add a fit to visualize the trend with `geom_smooth()`. 
 
 
 ```{r}
@@ -43,7 +43,7 @@ Plot the CDS1 expression on the X axis and the CDS2 Chronos scores on Y. Create 
 
 Challenge: 
 
-Try the same plot, but color the points by their `OncotreeLineage`. You might want to remove `geom_smooth()`, You should move the `color` aesthetics to `geom_point()`, otherwise `geom_smooth()` tries to compute many fits for very few datapoints, causing a ton of warnings and error messages. 
+Try the same plot, but color the points by their `OncotreeLineage`. You should move the `color` aesthetics to `geom_point()`, otherwise `geom_smooth()` tries to compute many fits for very few datapoints, causing a ton of warnings and error messages. 
 
 
 ```{r}
